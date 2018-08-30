@@ -8,24 +8,35 @@ package com.yuan.springbootjunit.test1;
 import com.yuan.springbootjunit.controller.PersonController;
 import com.yuan.springbootjunit.entity.Person;
 import com.yuan.springbootjunit.service.PersonService;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.ContextHierarchy;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
-
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
-
-
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -35,6 +46,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class PersonControllerTest extends BaseJunitTest{
 
+    ///**
+    // * Service 单元测试
+    // */
+    //@Autowired
+    //PersonService personService;
+    //@Test
+    //public void test(){
+    //    Person person = personService.getPerson(10);
+    //    assertEquals(15,person.getId());
+    //}
 
 
     /**
@@ -66,11 +87,11 @@ public class PersonControllerTest extends BaseJunitTest{
         //使用mock的对象
         String result = iterator.next() + " " + iterator.next() + " " + iterator.next();
         //验证结果
-        assertEquals("hello wo0rld world",result);
+        assertEquals("hello world world",result);
     }
 
 
-    @Autowired
+
     private MockMvc mockMvc;
 
 
@@ -82,7 +103,9 @@ public class PersonControllerTest extends BaseJunitTest{
 
     @Before
     public void setUp() throws Exception {
+        // 初始化Mock
         MockitoAnnotations.initMocks(this);
+        // 构造appcontext
         this.mockMvc = MockMvcBuilders.standaloneSetup(personController).build();
     }
 
@@ -94,7 +117,7 @@ public class PersonControllerTest extends BaseJunitTest{
      * 让后续方法按照自己的数据桩来返回，达到了隔离依赖的效果。
      */
     @Test
-    public void oooo() throws Exception {
+    public void getPersonTest() throws Exception {
 
         when(personService.getPerson(1)).thenReturn(new Person(1,"zhangsan"));
 
@@ -105,16 +128,13 @@ public class PersonControllerTest extends BaseJunitTest{
                 .andExpect(jsonPath("id").value(1))
                 .andExpect(jsonPath("name").value("zhangsan"));
 
-        verify(personService).getPerson(1);
+       // verify(personService).getPerson(1);
 
-        //Assert.assertEquals(result,new Person(1,"zhangsan"));
-
-
-        // 2.service stub test
-        //Person stub = new Person(1,"zhangsan");
-        //Mockito.when(personService.getPerson(3)).thenReturn(stub);
-        //Assert.assertEquals(stub, personService.getPerson(3));
-        //Mockito.verify(personService).getPerson(3);
+         //2.service stub test
+        Person stub = new Person(1,"zhangsan");
+        Mockito.when(personService.getPerson(3)).thenReturn(stub);
+        Assert.assertEquals(stub, personService.getPerson(3));
+        Mockito.verify(personService).getPerson(3);
     }
 
 
