@@ -4,7 +4,11 @@ import com.yuan.springbootjunit.entity.Person;
 
 public interface PersonService {
 
-    Person getPerson(int id);
+     Person getPerson(int id);
 
-    boolean update(Person person);
+     void savePerson(Person person);
+
+     void deletePerson(int id);
+
+     void updatePerson(Person person);
 }

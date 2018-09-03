@@ -5,98 +5,40 @@
  */
 package com.yuan.springbootjunit.test1;
 
+import com.yuan.springbootjunit.SpringbootJunitApplication;
 import com.yuan.springbootjunit.controller.PersonController;
 import com.yuan.springbootjunit.entity.Person;
-import com.yuan.springbootjunit.service.PersonService;
-import org.junit.Assert;
+import com.yuan.springbootjunit.service.impl.PersonServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.*;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.ContextHierarchy;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.servlet.ModelAndView;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.hamcrest.Matchers.is;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-
-public class PersonControllerTest extends BaseJunitTest{
-
-    ///**
-    // * Service 单元测试
-    // */
-    //@Autowired
-    //PersonService personService;
-    //@Test
-    //public void test(){
-    //    Person person = personService.getPerson(10);
-    //    assertEquals(15,person.getId());
-    //}
-
-
-    /**
-     * 验证行为是否发生
-     */
-    @Test
-    public void verify_behaviour(){
-        //模拟创建一个List对象
-        List mock = mock(List.class);
-        //使用mock的对象
-        mock.add(1);
-        mock.clear();
-        //验证add(1)和clear()行为是否发生
-        verify(mock).add(1);
-        verify(mock).clear();
-    }
-
-
-
-    /**
-     * 模拟期望结果
-     */
-    @Test
-    public void when_thenReturn(){
-        //mock一个Iterator类
-        Iterator iterator = mock(Iterator.class);
-        //预设当iterator调用next()时第一次返回hello，第n次都返回world
-        when(iterator.next()).thenReturn("hello").thenReturn("world");
-        //使用mock的对象
-        String result = iterator.next() + " " + iterator.next() + " " + iterator.next();
-        //验证结果
-        assertEquals("hello world world",result);
-    }
-
+@RunWith(MockitoJUnitRunner.class)
+@SpringBootTest(classes = SpringbootJunitApplication.class)
+@WebAppConfiguration
+public class PersonControllerTest {
 
 
     private MockMvc mockMvc;
 
 
-    @Mock
-    PersonService personService;
+    @Spy
+    PersonServiceImpl personService;
 
     @InjectMocks
     PersonController personController;
@@ -118,24 +60,46 @@ public class PersonControllerTest extends BaseJunitTest{
      */
     @Test
     public void getPersonTest() throws Exception {
-
-        when(personService.getPerson(1)).thenReturn(new Person(1,"zhangsan"));
-
-        // 1. controller mvc test
-         mockMvc.perform(get("/person/getPerson/1"))
+        int id = 1;
+        mockMvc.perform(get("/person/getPerson/"+id))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("id").value(1))
-                .andExpect(jsonPath("name").value("zhangsan"));
-
-       // verify(personService).getPerson(1);
-
-         //2.service stub test
-        Person stub = new Person(1,"zhangsan");
-        Mockito.when(personService.getPerson(3)).thenReturn(stub);
-        Assert.assertEquals(stub, personService.getPerson(3));
-        Mockito.verify(personService).getPerson(3);
+                .andExpect(jsonPath("data.id").value(1))
+                .andExpect(jsonPath("message").value("查询成功"));
     }
+
+    @Test
+    public void savePersonTest() throws Exception {
+        mockMvc.perform(post("/person/savePerson/").
+                contentType(TestUtil.APPLICATION_JSON_UTF8).
+        content(TestUtil.convertObjectToJsonBytes(new Person(1,"zhangsan")))
+        )
+        .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("success",is(true)));
+    }
+
+    @Test
+    public void deletePersonTest() throws Exception {
+        int id = 1;
+        mockMvc.perform(delete("/person/deletePerson/"+id))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("success", is(true)))
+                ;
+    }
+
+    @Test
+    public void updatePersonTest() throws Exception {
+        mockMvc.perform(
+                put("/person/updatePerson")
+                        .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                        .content(TestUtil.convertObjectToJsonBytes(new Person(1,"zhangsan"))))
+                .andDo(print())
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(jsonPath("success", is(true)));
+    }
+
 
 
 

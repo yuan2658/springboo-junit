@@ -9,7 +9,6 @@ package com.yuan.springbootjunit.test1;
 
 import com.yuan.springbootjunit.SpringbootJunitApplication;
 import com.yuan.springbootjunit.test.TestApp;
-import com.yuan.springbootjunit.test.User;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
@@ -36,14 +35,11 @@ public class TestClass {
 
     private TestApp testApp;
 
-    private User user1;
-    private User user2;
+
 
     @Before
     public void  before(){
         testApp = new TestApp();
-        user1 = new User();
-        user2 = new User();
     }
 
     @After
