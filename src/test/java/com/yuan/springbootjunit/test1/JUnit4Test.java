@@ -37,8 +37,9 @@ public class JUnit4Test {
         System.out.println("@Ignore");
     }
 
-    @Test(timeout = 50)
-    public void testTimeout() {
+    @Test(timeout = 5000)
+    public void testTimeout() throws InterruptedException {
+        Thread.sleep(4000);
         System.out.println("@Test(timeout = 50)");
         Assert.assertEquals(5 + 5, 10);
     }

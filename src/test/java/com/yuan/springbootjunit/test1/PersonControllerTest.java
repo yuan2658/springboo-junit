@@ -8,6 +8,7 @@ package com.yuan.springbootjunit.test1;
 import com.yuan.springbootjunit.SpringbootJunitApplication;
 import com.yuan.springbootjunit.controller.PersonController;
 import com.yuan.springbootjunit.entity.Person;
+import com.yuan.springbootjunit.service.PersonService;
 import com.yuan.springbootjunit.service.impl.PersonServiceImpl;
 import javafx.beans.binding.When;
 import org.junit.Before;
@@ -41,8 +42,17 @@ public class PersonControllerTest {
 
     private MockMvc mockMvc;
 
+
     @Autowired
     private WebApplicationContext wac;
+
+
+
+    @Mock
+    PersonService personService;
+
+    @InjectMocks
+    PersonController personController;
 
     @Before
     public void setUp() throws Exception {
@@ -95,6 +105,23 @@ public class PersonControllerTest {
                 .andDo(print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(jsonPath("success", is(true)));
+        when(personService.getPerson(1)).thenReturn(new Person(1,"lisi"));
+
+         //1. controller mvc test
+         mockMvc.perform(get("/person/getPerson/1"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").value(1))
+                .andExpect(jsonPath("name").value("lisi"));
+
+       // verify(personService).getPerson(1);
+
+         //2.service stub test
+//        Person stub = new Person(1,"zhangsan");
+//        when(personService.getPerson(3)).thenReturn(stub);
+//        Assert.assertEquals(stub, personService2.getPerson(3));
+//        verify(personService2).getPerson(3);
+
     }
 
 

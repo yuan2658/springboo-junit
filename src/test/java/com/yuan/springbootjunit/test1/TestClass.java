@@ -55,7 +55,7 @@ public class TestClass {
         //Hamcrest
         //assertThat(responseString, anyOf(containsString("color"), containsString("colour")));
 
-        assertThat(138,is(testApp.add(120,18)));
+        assertThat(118,is(testApp.add(120,18)));
         assertThat(200,greaterThan(55));
         assertThat(20,allOf(greaterThan(10), lessThan(120)));
 
@@ -115,8 +115,9 @@ public class TestClass {
 
 
     @Test(expected = IllegalArgumentException.class)
-    public void test2(){
+        public void test2(){
         testApp.canVote(0);
+
     }
 
 
@@ -125,14 +126,15 @@ public class TestClass {
     @Test
     public void test3(){
         expectedException.expect(IllegalArgumentException.class);
-       //expectedException.expect(NullPointerException.class);
-        testApp.canVote(0);
+        //expectedException.expect(NullPointerException.class);
+        testApp.canVote(1) ;
+        //throw new NullPointerException();
     }
 
     @Test
     public void test4(){
         try {
-            testApp.canVote(0);
+            testApp.canVote(1);
             fail("expected IllegalArgumentException to be thrown");
         }catch (IllegalArgumentException ex){
             assertThat(ex.getMessage(),containsString("age should be +"));
